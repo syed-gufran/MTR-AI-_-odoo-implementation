@@ -143,6 +143,25 @@
       </field>
     </record>
 
+    <record model="ir.ui.view" id="view_mtr_pdf_upload_wizard_form">
+      <field name="name">mtr.pdf.upload.wizard.form</field>
+      <field name="model">mtr.pdf.upload.wizard</field>
+      <field name="arch" type="xml">
+        <form string="Upload MTR PDF">
+          <group>
+            <field name="file_name"/>
+            <field name="file_data" filename="file_name"/>
+            <field name="webhook_url" placeholder="http://n8n:5678/webhook/mtr-upload"/>
+            <field name="save_as_default"/>
+          </group>
+          <footer>
+            <button string="Send to n8n" type="object" name="action_send_to_n8n" class="btn-primary"/>
+            <button string="Cancel" class="btn-secondary" special="cancel"/>
+          </footer>
+        </form>
+      </field>
+    </record>
+
     <record model="ir.ui.view" id="view_mtr_inventory_join_report_tree">
       <field name="name">mtr.inventory.join.report.tree</field>
       <field name="model">mtr.inventory.join.report</field>
@@ -270,10 +289,19 @@
       <field name="view_mode">tree,form</field>
     </record>
 
+    <record model="ir.actions.act_window" id="action_mtr_pdf_upload_popup">
+      <field name="name">Send MTR PDF to n8n</field>
+      <field name="res_model">mtr.pdf.upload.wizard</field>
+      <field name="view_mode">form</field>
+      <field name="target">new</field>
+    </record>
+
     <menuitem name="MTR Module" id="mtr_module.menu_root"/>
 
     <menuitem name="MTR Data" id="mtr_module.menu_mtr_data" parent="mtr_module.menu_root"
-              action="action_mtr_data"/>
+              action="action_mtr_data" sequence="5"/>
+    <menuitem name="Send MTR PDF to n8n" id="mtr_module.menu_mtr_pdf_upload" parent="mtr_module.menu_root"
+              action="action_mtr_pdf_upload_popup" sequence="10"/>
     <menuitem name="Inventory" id="mtr_module.menu_inventory" parent="mtr_module.menu_root"
               action="action_inventory_record"/>
     <menuitem name="Import Inventory" id="mtr_module.menu_inventory_import" parent="mtr_module.menu_root"

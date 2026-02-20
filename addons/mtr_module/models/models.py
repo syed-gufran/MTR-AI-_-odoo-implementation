@@ -5,6 +5,8 @@ import datetime
 import io
 import json
 import re
+import urllib.error
+import urllib.request
 
 from odoo import _, api, fields, models, tools
 from odoo.exceptions import UserError, ValidationError
@@ -398,6 +400,71 @@ class InventoryImportWizard(models.TransientModel):
             row = {headers[idx]: (line[idx] if idx < len(line) else "") for idx in range(len(headers))}
             payload.append(row)
         return payload
+
+
+class MtrPdfUploadWizard(models.TransientModel):
+    _name = "mtr.pdf.upload.wizard"
+    _description = "MTR PDF Upload Wizard"
+
+    file_data = fields.Binary(required=True)
+    file_name = fields.Char(required=True)
+    webhook_url = fields.Char(
+        required=True,
+        default=lambda self: self.env["ir.config_parameter"].sudo().get_param("mtr_module.n8n_webhook_url"),
+    )
+    save_as_default = fields.Boolean(default=True)
+
+    def action_send_to_n8n(self):
+        self.ensure_one()
+        if not self.file_data or not self.file_name:
+            raise UserError(_("Please upload a PDF file."))
+        if not (self.file_name or "").lower().endswith(".pdf"):
+            raise UserError(_("Only PDF files are supported for MTR upload."))
+        if not self.webhook_url:
+            raise UserError(_("Webhook URL is required."))
+
+        if self.save_as_default:
+            self.env["ir.config_parameter"].sudo().set_param("mtr_module.n8n_webhook_url", self.webhook_url)
+
+        encoded_file = self.file_data
+        if isinstance(encoded_file, bytes):
+            encoded_file = encoded_file.decode("utf-8")
+
+        payload = {
+            "source": "odoo13_mtr_module",
+            "database": self.env.cr.dbname,
+            "file_name": self.file_name,
+            "file_content_base64": encoded_file,
+            "uploaded_at": fields.Datetime.now().isoformat(),
+            "uploaded_by": self.env.user.login,
+        }
+        data = json.dumps(payload).encode("utf-8")
+        request = urllib.request.Request(
+            self.webhook_url,
+            data=data,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+
+        try:
+            with urllib.request.urlopen(request, timeout=45) as response:
+                response_body = response.read().decode("utf-8", errors="replace")
+        except urllib.error.HTTPError as exc:
+            error_body = exc.read().decode("utf-8", errors="replace")
+            raise UserError(_("Webhook failed (%s): %s") % (exc.code, error_body[:400]))
+        except Exception as exc:
+            raise UserError(_("Failed to reach webhook: %s") % str(exc))
+
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {
+                "title": _("PDF Sent"),
+                "message": _("MTR PDF sent to n8n successfully. Response: %s") % (response_body[:200] or "OK"),
+                "type": "success",
+                "sticky": False,
+            },
+        }
 
 
 class MtrInventoryJoinReport(models.Model):
