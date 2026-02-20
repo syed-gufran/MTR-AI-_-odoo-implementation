@@ -1,0 +1,51 @@
+services:
+  db:
+    image: postgres:10
+    platform: linux/amd64
+    container_name: odoo13-db
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=odoo
+      - POSTGRES_PASSWORD=odoo
+    volumes:
+      - odoo-db-data:/var/lib/postgresql/data
+
+  odoo:
+    image: odoo:13.0
+    platform: linux/amd64   
+    container_name: odoo13
+    depends_on:
+      - db
+    ports:
+      - "8069:8069"
+    environment:
+      - HOST=db
+      - USER=odoo
+      - PASSWORD=odoo
+    volumes:
+      - odoo-web-data:/var/lib/odoo
+      - ./addons:/mnt/extra-addons
+    restart: always
+
+  n8n:
+    image: n8nio/n8n:latest
+    platform: linux/amd64
+    container_name: n8n
+    depends_on:
+      - odoo
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - N8N_SECURE_COOKIE=false
+      - TZ=America/New_York
+    volumes:
+      - n8n-data:/home/node/.n8n
+    restart: always
+
+volumes:
+  odoo-db-data:
+  odoo-web-data:
+  n8n-data:

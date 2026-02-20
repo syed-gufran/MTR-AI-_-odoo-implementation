@@ -1,0 +1,197 @@
+<odoo>
+  <data>
+    <record model="ir.ui.view" id="view_mtr_data_form">
+      <field name="name">mtr.data.form</field>
+      <field name="model">mtr.data</field>
+      <field name="arch" type="xml">
+        <form string="MTR Data">
+          <sheet>
+            <group>
+              <group>
+                <field name="heat_number"/>
+                <field name="batch_number"/>
+                <field name="grade"/>
+                <field name="manufacturer"/>
+                <field name="certificate_number"/>
+                <field name="certificate_date"/>
+              </group>
+              <group>
+                <field name="country_of_melt"/>
+                <field name="country_of_manufacture"/>
+                <field name="source_file"/>
+                <field name="uploaded_at"/>
+              </group>
+            </group>
+            <notebook>
+              <page string="Chemistry">
+                <group>
+                  <field name="c_element"/>
+                  <field name="mn_element"/>
+                  <field name="si_element"/>
+                  <field name="p_element"/>
+                  <field name="s_element"/>
+                  <field name="cu_element"/>
+                  <field name="ni_element"/>
+                  <field name="cr_element"/>
+                  <field name="mo_element"/>
+                  <field name="n_element"/>
+                </group>
+              </page>
+              <page string="Mechanical">
+                <group>
+                  <field name="yield_strength"/>
+                  <field name="tensile_strength"/>
+                  <field name="elongation"/>
+                  <field name="reduction_area"/>
+                  <field name="hardness"/>
+                </group>
+              </page>
+              <page string="Impact">
+                <group>
+                  <field name="impact_test_temp"/>
+                  <field name="impact_coupon_size"/>
+                  <field name="impact_specimen_1"/>
+                  <field name="impact_specimen_2"/>
+                  <field name="impact_specimen_3"/>
+                  <field name="impact_average"/>
+                </group>
+              </page>
+            </notebook>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_mtr_data_tree">
+      <field name="name">mtr.data.tree</field>
+      <field name="model">mtr.data</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="heat_number"/>
+          <field name="batch_number"/>
+          <field name="grade"/>
+          <field name="manufacturer"/>
+          <field name="certificate_date"/>
+          <field name="yield_strength"/>
+          <field name="tensile_strength"/>
+        </tree>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_inventory_record_tree">
+      <field name="name">inventory.record.tree</field>
+      <field name="model">inventory.record</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="lot_number"/>
+          <field name="heat_number"/>
+          <field name="slab_number"/>
+          <field name="grade"/>
+          <field name="dimensions"/>
+          <field name="weight"/>
+          <field name="posting_date"/>
+        </tree>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_inventory_record_form">
+      <field name="name">inventory.record.form</field>
+      <field name="model">inventory.record</field>
+      <field name="arch" type="xml">
+        <form string="Inventory Record">
+          <sheet>
+            <group>
+              <group>
+                <field name="lot_number"/>
+                <field name="heat_number"/>
+                <field name="slab_number"/>
+                <field name="grade"/>
+                <field name="dimensions"/>
+                <field name="weight"/>
+                <field name="posting_date"/>
+              </group>
+              <group>
+                <field name="country_of_melt"/>
+                <field name="country_of_manufacture"/>
+                <field name="source_file"/>
+              </group>
+            </group>
+            <group>
+              <field name="raw_row_data"/>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_inventory_import_wizard_form">
+      <field name="name">inventory.import.wizard.form</field>
+      <field name="model">inventory.import.wizard</field>
+      <field name="arch" type="xml">
+        <form string="Import Inventory">
+          <group>
+            <field name="file_name"/>
+            <field name="file_data" filename="file_name"/>
+            <field name="delimiter"/>
+            <field name="has_header"/>
+          </group>
+          <footer>
+            <button string="Import" type="object" name="action_import" class="btn-primary"/>
+            <button string="Cancel" class="btn-secondary" special="cancel"/>
+          </footer>
+        </form>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_mtr_inventory_join_report_tree">
+      <field name="name">mtr.inventory.join.report.tree</field>
+      <field name="model">mtr.inventory.join.report</field>
+      <field name="arch" type="xml">
+        <tree create="false" edit="false" delete="false">
+          <field name="lot_number"/>
+          <field name="heat_number"/>
+          <field name="grade"/>
+          <field name="c_element"/>
+          <field name="mn_element"/>
+          <field name="yield_strength"/>
+        </tree>
+      </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_mtr_data">
+      <field name="name">MTR Data</field>
+      <field name="res_model">mtr.data</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_inventory_record">
+      <field name="name">Inventory</field>
+      <field name="res_model">inventory.record</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_inventory_import_wizard">
+      <field name="name">Import Inventory</field>
+      <field name="res_model">inventory.import.wizard</field>
+      <field name="view_mode">form</field>
+      <field name="target">new</field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_mtr_inventory_join_report">
+      <field name="name">MTR Inventory Join</field>
+      <field name="res_model">mtr.inventory.join.report</field>
+      <field name="view_mode">tree</field>
+    </record>
+
+    <menuitem name="MTR Module" id="mtr_module.menu_root"/>
+
+    <menuitem name="MTR Data" id="mtr_module.menu_mtr_data" parent="mtr_module.menu_root"
+              action="action_mtr_data"/>
+    <menuitem name="Inventory" id="mtr_module.menu_inventory" parent="mtr_module.menu_root"
+              action="action_inventory_record"/>
+    <menuitem name="Import Inventory" id="mtr_module.menu_inventory_import" parent="mtr_module.menu_root"
+              action="action_inventory_import_wizard"/>
+    <menuitem name="Join Report" id="mtr_module.menu_join_report" parent="mtr_module.menu_root"
+              action="action_mtr_inventory_join_report"/>
+  </data>
+</odoo>

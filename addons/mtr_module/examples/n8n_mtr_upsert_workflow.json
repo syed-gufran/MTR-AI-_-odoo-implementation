@@ -1,0 +1,192 @@
+{
+  "name": "Odoo13 MTR Upsert (Safe JSON)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "1",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            { "name": "odoo_url", "value": "http://host.docker.internal:8069" },
+            { "name": "db_name", "value": "tazeem" },
+            { "name": "odoo_login", "value": "admin" },
+            { "name": "odoo_password", "value": "admin" },
+            { "name": "heat_number", "value": "H100" },
+            { "name": "batch_number", "value": "B1" },
+            { "name": "grade", "value": "A106" },
+            { "name": "manufacturer", "value": "ABC Steel" },
+            { "name": "certificate_number", "value": "CERT-001" },
+            { "name": "certificate_date", "value": "2026-02-20" },
+            { "name": "impact_coupon_size", "value": "10x10" },
+            { "name": "country_of_melt", "value": "US" },
+            { "name": "country_of_manufacture", "value": "US" },
+            { "name": "source_file", "value": "mtr_001.pdf" }
+          ],
+          "number": [
+            { "name": "c", "value": 0.21 },
+            { "name": "mn", "value": 1.15 },
+            { "name": "si", "value": 0.25 },
+            { "name": "p", "value": 0.012 },
+            { "name": "s", "value": 0.004 },
+            { "name": "cu", "value": 0.03 },
+            { "name": "ni", "value": 0.02 },
+            { "name": "cr", "value": 0.04 },
+            { "name": "mo", "value": 0.01 },
+            { "name": "n", "value": 0.006 },
+            { "name": "yield_strength", "value": 360 },
+            { "name": "tensile_strength", "value": 520 },
+            { "name": "elongation", "value": 28 },
+            { "name": "reduction_area", "value": 45 },
+            { "name": "hardness", "value": 170 },
+            { "name": "impact_test_temp", "value": -46 },
+            { "name": "impact_specimen_1", "value": 62 },
+            { "name": "impact_specimen_2", "value": 64 },
+            { "name": "impact_specimen_3", "value": 63 },
+            { "name": "impact_average", "value": 63 }
+          ]
+        }
+      },
+      "id": "2",
+      "name": "Set Odoo + MTR Payload",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const j = item.json;\n  return {\n    json: {\n      ...j,\n      rpc_url: `${j.odoo_url}/jsonrpc`,\n      auth_body: {\n        jsonrpc: '2.0',\n        method: 'call',\n        params: {\n          service: 'common',\n          method: 'authenticate',\n          args: [j.db_name, j.odoo_login, j.odoo_password, {}],\n        },\n        id: 1,\n      },\n    },\n  };\n});"
+      },
+      "id": "3",
+      "name": "Build Auth Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [760, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://odoo:8069/jsonrpc",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{$json.auth_body}}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "4",
+      "name": "Auth to Odoo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1010, 300]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition"
+      },
+      "id": "5",
+      "name": "Merge Auth + Payload",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [1260, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const j = item.json;\n  const uid = j.result;\n  const rpcUrl = j.rpc_url || `${j.odoo_url}/jsonrpc`;\n  return {\n    json: {\n      ...j,\n      rpc_url: rpcUrl,\n      upsert_body: {\n        jsonrpc: '2.0',\n        method: 'call',\n        params: {\n          service: 'object',\n          method: 'execute_kw',\n          args: [\n            j.db_name,\n            uid,\n            j.odoo_password,\n            'mtr.data',\n            'upsert_from_payload',\n            [{\n              heat_number: j.heat_number,\n              batch_number: j.batch_number,\n              grade: j.grade,\n              manufacturer: j.manufacturer,\n              certificate_number: j.certificate_number,\n              certificate_date: j.certificate_date,\n              c: j.c,\n              mn: j.mn,\n              si: j.si,\n              p: j.p,\n              s: j.s,\n              cu: j.cu,\n              ni: j.ni,\n              cr: j.cr,\n              mo: j.mo,\n              n: j.n,\n              yield_strength: j.yield_strength,\n              tensile_strength: j.tensile_strength,\n              elongation: j.elongation,\n              reduction_area: j.reduction_area,\n              hardness: j.hardness,\n              impact_test_temp: j.impact_test_temp,\n              impact_coupon_size: j.impact_coupon_size,\n              impact_specimen_1: j.impact_specimen_1,\n              impact_specimen_2: j.impact_specimen_2,\n              impact_specimen_3: j.impact_specimen_3,\n              impact_average: j.impact_average,\n              country_of_melt: j.country_of_melt,\n              country_of_manufacture: j.country_of_manufacture,\n              source_file: j.source_file,\n            }],\n          ],\n        },\n        id: 2,\n      },\n    },\n  };\n});"
+      },
+      "id": "6",
+      "name": "Build Upsert Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1510, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://odoo:8069/jsonrpc",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{$json.upsert_body}}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "7",
+      "name": "Upsert MTR in Odoo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1760, 300]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          { "node": "Set Odoo + MTR Payload", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Set Odoo + MTR Payload": {
+      "main": [
+        [
+          { "node": "Build Auth Request", "type": "main", "index": 0 },
+          { "node": "Merge Auth + Payload", "type": "main", "index": 1 }
+        ]
+      ]
+    },
+    "Build Auth Request": {
+      "main": [
+        [
+          { "node": "Auth to Odoo", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Auth to Odoo": {
+      "main": [
+        [
+          { "node": "Merge Auth + Payload", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Merge Auth + Payload": {
+      "main": [
+        [
+          { "node": "Build Upsert Request", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Build Upsert Request": {
+      "main": [
+        [
+          { "node": "Upsert MTR in Odoo", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "versionId": "2",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "id": "odoo13-mtr-upsert-safe",
+  "tags": []
+}
