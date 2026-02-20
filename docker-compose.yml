@@ -42,6 +42,7 @@ services:
       - N8N_SECURE_COOKIE=false
       - TZ=America/New_York
     volumes:
+      - .:/home/node/.n8n-files
       - n8n-data:/home/node/.n8n
     restart: always
 

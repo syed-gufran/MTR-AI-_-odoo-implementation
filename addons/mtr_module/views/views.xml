@@ -148,13 +148,100 @@
       <field name="model">mtr.inventory.join.report</field>
       <field name="arch" type="xml">
         <tree create="false" edit="false" delete="false">
-          <field name="lot_number"/>
-          <field name="heat_number"/>
-          <field name="grade"/>
-          <field name="c_element"/>
-          <field name="mn_element"/>
-          <field name="yield_strength"/>
+          <field name="join_status"/>
+          <field name="inv_lot_number"/>
+          <field name="inv_heat_number"/>
+          <field name="inv_grade"/>
+          <field name="mtr_batch_number"/>
+          <field name="mtr_grade"/>
+          <field name="mtr_c"/>
+          <field name="mtr_mn"/>
+          <field name="mtr_yield_strength"/>
+          <field name="inv_posting_date"/>
         </tree>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_mtr_inventory_join_report_form">
+      <field name="name">mtr.inventory.join.report.form</field>
+      <field name="model">mtr.inventory.join.report</field>
+      <field name="arch" type="xml">
+        <form string="MTR Inventory Join Report" create="false" edit="false" delete="false">
+          <sheet>
+            <group>
+              <group>
+                <field name="join_status"/>
+                <field name="inv_lot_number"/>
+                <field name="inv_heat_number"/>
+                <field name="inv_grade"/>
+              </group>
+              <group>
+                <field name="mtr_batch_number"/>
+                <field name="mtr_grade"/>
+                <field name="mtr_manufacturer"/>
+                <field name="mtr_uploaded_at"/>
+              </group>
+            </group>
+            <notebook>
+              <page string="Inventory">
+                <group>
+                  <field name="inv_entry_no"/>
+                  <field name="inv_date"/>
+                  <field name="inv_posting_date"/>
+                  <field name="inv_location_code"/>
+                  <field name="inv_item_no"/>
+                  <field name="inv_description"/>
+                  <field name="inv_item_description"/>
+                  <field name="inv_quantity"/>
+                  <field name="inv_weight"/>
+                  <field name="inv_unit_of_measure_code"/>
+                  <field name="inv_dimensions"/>
+                  <field name="inv_slab_number"/>
+                  <field name="inv_internal_bin"/>
+                  <field name="inv_origin_code"/>
+                  <field name="inv_country_of_melt"/>
+                  <field name="inv_country_of_manufacture"/>
+                  <field name="inv_source_file"/>
+                </group>
+              </page>
+              <page string="MTR">
+                <group>
+                  <field name="mtr_id"/>
+                  <field name="mtr_heat_number"/>
+                  <field name="mtr_batch_number"/>
+                  <field name="mtr_grade"/>
+                  <field name="mtr_manufacturer"/>
+                  <field name="mtr_certificate_number"/>
+                  <field name="mtr_certificate_date"/>
+                  <field name="mtr_c"/>
+                  <field name="mtr_mn"/>
+                  <field name="mtr_si"/>
+                  <field name="mtr_p"/>
+                  <field name="mtr_s"/>
+                  <field name="mtr_cu"/>
+                  <field name="mtr_ni"/>
+                  <field name="mtr_cr"/>
+                  <field name="mtr_mo"/>
+                  <field name="mtr_n"/>
+                  <field name="mtr_yield_strength"/>
+                  <field name="mtr_tensile_strength"/>
+                  <field name="mtr_elongation"/>
+                  <field name="mtr_reduction_area"/>
+                  <field name="mtr_hardness"/>
+                  <field name="mtr_impact_test_temp"/>
+                  <field name="mtr_impact_coupon_size"/>
+                  <field name="mtr_impact_specimen_1"/>
+                  <field name="mtr_impact_specimen_2"/>
+                  <field name="mtr_impact_specimen_3"/>
+                  <field name="mtr_impact_average"/>
+                  <field name="mtr_country_of_melt"/>
+                  <field name="mtr_country_of_manufacture"/>
+                  <field name="mtr_source_file"/>
+                </group>
+              </page>
+            </notebook>
+          </sheet>
+        </form>
       </field>
     </record>
 
@@ -180,7 +267,7 @@
     <record model="ir.actions.act_window" id="action_mtr_inventory_join_report">
       <field name="name">MTR Inventory Join</field>
       <field name="res_model">mtr.inventory.join.report</field>
-      <field name="view_mode">tree</field>
+      <field name="view_mode">tree,form</field>
     </record>
 
     <menuitem name="MTR Module" id="mtr_module.menu_root"/>
